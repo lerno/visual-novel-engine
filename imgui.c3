@@ -1,9 +1,9 @@
 module imgui;
 
-def SomeFlags = CInt;
-def ImVec2 = float[2];
+alias SomeFlags = CInt;
+alias ImVec2 = float[2];
 
-distinct ImGuiTableFlags = CInt;
+typedef ImGuiTableFlags = CInt;
 
 const ImGuiTableFlags TABLE_NONE                       = 0;
 const ImGuiTableFlags TABLE_RESIZABLE                  = 1 << 0;   // Enable resizing columns.

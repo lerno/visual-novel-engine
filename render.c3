@@ -13,7 +13,7 @@ import log;
 import raylib;
 import imgui;
 
-def LoadingThreadPool = ThreadPool(<16384>);
+alias LoadingThreadPool = ThreadPool{16384};
 
 RenderTexture2D game_texture;
 Rectangle       game_rectangle;

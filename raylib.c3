@@ -26,7 +26,7 @@ struct Texture {
     CInt  format;
 }
 
-def Texture2D = Texture;
+alias Texture2D = Texture;
 
 struct RenderTexture {
     CUInt   id;
@@ -34,7 +34,7 @@ struct RenderTexture {
     Texture depth;
 }
 
-def RenderTexture2D = RenderTexture;
+alias RenderTexture2D = RenderTexture;
 
 struct Image {
     void* data;
@@ -61,7 +61,7 @@ struct Font {
     GlyphInfo* glyphs;
 }
 
-def CVector2 = float[2];
+alias CVector2 = float[2];
 
 struct AudioStream {
     void* buffer;
@@ -196,7 +196,7 @@ enum KeyboardKey : CInt (CInt value) {
     VOLUME_DOWN     = 25        // Key: Android volume down button
 }
 
-distinct ConfigFlags = CUInt;
+typedef ConfigFlags = CUInt;
 
 const CUInt FLAG_VSYNC_HINT               = 0x00000040;
 const CUInt FLAG_FULLSCREEN_MODE          = 0x00000002;

@@ -12,14 +12,14 @@ import raylib;
 import animation;
 import log;
 
-def ActionList           = List(<Action>);
-def FlagList             = List(<Flag>);
-def StringList           = List(<String>);
-def SceneList            = List(<Scene>);
-def TokenList            = List(<Token>);
-def InstructionIndexList = List(<InstructionIndex>);
+alias ActionList           = List{Action};
+alias FlagList             = List{Flag};
+alias StringList           = List{String};
+alias SceneList            = List{Scene};
+alias TokenList            = List{Token};
+alias InstructionIndexList = List{InstructionIndex};
 
-def FlagIndex = uint;
+alias FlagIndex = uint;
 
 enum TokenType : char {
     INVALID_TOKEN,
@@ -226,16 +226,14 @@ fn bool has_flag(String name) @inline {
     return false;
 }
 
-fault CompilerFault {
-    FLAG_NOT_FOUND,
-}
+faultdef FLAG_NOT_FOUND;
 
-fn FlagIndex! get_flag_index(String name) @inline {
+fn FlagIndex? get_flag_index(String name) @inline {
     for(FlagIndex i = 0; i < flags.len(); i++) {
         if (flags[i].name == name) return i;
     }
 
-    return CompilerFault.FLAG_NOT_FOUND?;
+    return FLAG_NOT_FOUND?;
 }
 
 fn bool is_whitespace(char c) @inline { return c == ' ' || c == '\n' || c == '\t'; }
@@ -263,7 +261,7 @@ fn void die_with_location(Location location, String format, args...) @noreturn {
     unreachable();
 }
 
-fn void! load_file(String path) {
+fn void? load_file(String path) {
     tokenizing_cursor   = 0;
     tokenizing_location = { 0, 0 };
     filename            = path;
@@ -720,24 +718,22 @@ fn void parse_statement_block(ActionList* actions) {
 
             String music_name = expect(TokenType.IDENTIFIER).identifier_value;
 
-            action.music_index = {|
-                if(try maybe_index = common::get_music_index_by_name(music_name)) return maybe_index;
-
-                die("Trying to play non-existent music track '%s'", music_name);
-            |};
-
+			if(try maybe_index = common::get_music_index_by_name(music_name)) {
+				action.music_index = maybe_index;
+			} else {
+				die("Trying to play non-existent music track '%s'", music_name);
+            }
             expect(TokenType.SEMICOLON);
         case TokenType.KEYWORD_STOP_MUSIC:
             action.action_type = ActionType.STOP_MUSIC;
 
             String music_name = expect(TokenType.IDENTIFIER).identifier_value;
 
-            action.music_index = {|
-                if(try maybe_index = common::get_music_index_by_name(music_name)) return maybe_index;
-
-                die("Trying to stop non-existent music track '%s'", music_name);
-            |};
-
+            if(try maybe_index = common::get_music_index_by_name(music_name)) {
+            	action.music_index = maybe_index;
+            } else {
+            	die("Trying to stop non-existent music track '%s'", music_name);
+            }
             expect(TokenType.SEMICOLON);
         case TokenType.IDENTIFIER:
             action.action_type = ActionType.SAY;

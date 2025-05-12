@@ -19,14 +19,14 @@ enum AnimationType : char {
     IDLE
 }
 
-def AnimationIndex = usz;
+alias AnimationIndex = usz;
 
 struct Animation {
     AnimationType animation_type;
 
     union {
 
-        List(<AnimationIndex>) animations;
+        List{AnimationIndex} animations;
 
         AnimationIndex animation_to_loop;
 
@@ -50,17 +50,16 @@ struct Animation {
     }
 }
 
-List(<Animation>) animation_list;
+List{Animation} animation_list;
 
 fn void init_animation_system() {
+	animation_list.init(mem);
     animation_list.push({ .animation_type = IDLE });
 }
 
-fault AnimationFault {
-    ANIMATION_NOT_GROUP_OR_SEQUENCE
-}
+faultdef ANIMATION_NOT_GROUP_OR_SEQUENCE;
 
-fn void! Animation.push(&animation, Animation new_animation) {
+fn void? Animation.push(&animation, Animation new_animation) {
     switch(animation.animation_type) {
     case SEQUENCE:
     case GROUP:
@@ -70,7 +69,7 @@ fn void! Animation.push(&animation, Animation new_animation) {
         animation_list.push(new_animation);
         animation.animation_to_loop = animation_list.size - 1;
     default:
-        return AnimationFault.ANIMATION_NOT_GROUP_OR_SEQUENCE?;
+        return ANIMATION_NOT_GROUP_OR_SEQUENCE?;
     }
 }
 

@@ -11,7 +11,7 @@ import imgui;
 import log;
 import compiler;
 
-def InstructionIndex = usz;
+alias InstructionIndex = usz;
 
 enum InstructionType : char {
     SHOW_TEXT,
@@ -87,8 +87,8 @@ struct ReverseInstruction {
     InstructionIndex   previous_instruction_pointer;
 }
 
-def InstructionList        = List(<Instruction>);
-def ReverseInstructionList = List(<ReverseInstruction>);
+alias InstructionList        = List{Instruction};
+alias ReverseInstructionList = List{ReverseInstruction};
 
 InstructionIndex       instruction_pointer;
 InstructionList        instructions;
