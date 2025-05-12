@@ -7,8 +7,8 @@ import std::collections::list;
 
 import log;
 
-def Color   = char[<4>];
-def Vector2 = float[<2>];
+alias Color   = char[<4>];
+alias Vector2 = float[<2>];
 
 const Color WHITE = { 255, 255, 255, 255 };
 const Color RED   = { 255,   0,   0, 255 };
@@ -29,9 +29,9 @@ struct SpriteData {
     bool      needs_flip;
 }
 
-List(<SpriteData>) sprite_data_list;
+List{SpriteData} sprite_data_list = list::ONHEAP{SpriteData};
 
-def SpriteDataIndex = usz;
+alias SpriteDataIndex = usz;
 
 macro SpriteDataIndex push_sprite_data(SpriteData data) {
     sprite_data_list.push(data);
@@ -45,9 +45,9 @@ struct MusicData {
     String filename;
 }
 
-List(<MusicData>) music_data_list;
+List{MusicData} music_data_list = list::ONHEAP{MusicData};
 
-def MusicDataIndex = usz;
+alias MusicDataIndex = usz;
 
 const MusicDataIndex NO_MUSIC = ~0;
 
@@ -60,17 +60,14 @@ fn bool music_exists(String name) {
 
     return false;
 }
+faultdef MUSIC_NOT_FOUND;
 
-fault SomeFaultIGuess {
-    MUSIC_NOT_FOUND,
-}
-
-fn MusicDataIndex! get_music_index_by_name(String name) {
+fn MusicDataIndex? get_music_index_by_name(String name) {
     for(MusicDataIndex i = 0; i < music_data_list.len(); i++) {
         if(music_data_list[i].name == name) return i;
     }
 
-    return SomeFaultIGuess.MUSIC_NOT_FOUND?;
+    return MUSIC_NOT_FOUND?;
 }
 
 enum Direction : char (String value) {
@@ -89,12 +86,12 @@ struct Character {
     String    name;
     Direction direction;
 
-    HashMap(<String, SpriteDataIndex>) emotion_sprite_table;
+    HashMap{String, SpriteDataIndex} emotion_sprite_table;
 }
 
-def CharacterIndex = uint;
-List(<Character>) characters;
-HashMap(<String, CharacterIndex>) character_name_table;
+alias CharacterIndex = uint;
+List{Character} characters;
+HashMap{String, CharacterIndex} character_name_table;
 
 macro Character* get_character_by_name(String name) {
     return &characters[common::character_name_table[name]!!];
@@ -109,7 +106,7 @@ AnimationIndex current_animation = IDLE_ANIMATION;
 const SpriteDataIndex INVALID_BACKGROUND = ~0;
 SpriteDataIndex current_background = INVALID_BACKGROUND;
 
-HashMap(<String, SpriteDataIndex>) background_name_table;
+HashMap{String, SpriteDataIndex} background_name_table;
 
 macro bool background_exists(String name) {
     return background_name_table.has_key(name);
@@ -143,7 +140,7 @@ macro void @print_type_tree(#type, uint recursion_level = 0) {
 
     log::debug("%.*s%s: %d.", recursion_level * 4, SPACES, #type.nameof == "" ? "anonymous field" : #type.nameof, #type.sizeof);
 
-    $foreach ($field : #type.membersof)
+    $foreach $field : #type.membersof:
         $if $field.nameof == "":
             @print_type_tree($field, recursion_level + 1);
         $else
